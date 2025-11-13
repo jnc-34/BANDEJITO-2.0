@@ -20,6 +20,19 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "vite.config.ts", "tailwind.config.js", "postcss.config.js", "index.tsx", "types.ts", "constants.ts", "components", "services", "App.tsx"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  
+  // Incluimos solo los archivos de código que TSC debe verificar.
+  // El punto "." incluye todos los archivos TS/TSX en la raíz y subcarpetas (App.tsx, components/, etc.).
+  "include": ["."], 
+  
+  "references": [{ "path": "./tsconfig.node.json" }],
+  
+  // ¡Sección EXCLUDE agregada! Ignoramos los archivos de configuración que causaron el error TS6305.
+  "exclude": [
+    "vite.config.ts", 
+    "tailwind.config.js", 
+    "postcss.config.js",
+    "node_modules",
+    "dist"
+  ]
 }
