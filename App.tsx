@@ -4,12 +4,10 @@ import FileUpload from './components/FileUpload';
 import AssigneeManager from './components/AssigneeManager';
 import TaskList from './components/TaskList';
 import { extractTextFromPdf } from './services/pdfService';
-// Importamos la función de procesamiento Y la nueva función de carga de configuración
 import { processPdfText, loadConfiguration } from './services/geminiService';
 
 // ----------------------------------------------------
 // 🟢 Lógica de Asignación Numérica (Regla de tu negocio)
-// NOTA: Esta función NO está en el componente y usa la configuración cargada
 // ----------------------------------------------------
 function getResponsable(rawNumero: string, config: any): string {
     const numeroStr = rawNumero.trim();
@@ -29,7 +27,6 @@ function getResponsable(rawNumero: string, config: any): string {
         const reglasExcepcion = asignacion.regla_excepcion_0_8[lastDigit];
         
         for (const regla of reglasExcepcion) {
-            // Buscamos una coincidencia exacta de los dos dígitos en la lista
             if (regla.digitos.includes(lastTwoDigits)) {
                 return regla.responsable;
             }
@@ -54,7 +51,6 @@ function getResponsable(rawNumero: string, config: any): string {
 // Componente principal de la aplicación
 // ----------------------------------------------------
 const App: React.FC = () => {
-  // State para almacenar la configuración (Responsables y Reglas)
   const [config, setConfig] = useState<any>(null);
   
   const [isLoading, setIsLoading] = useState(false);
@@ -62,19 +58,17 @@ const App: React.FC = () => {
   const [distributedTasks, setDistributedTasks] = useState<DistributedTask[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   
-  // Efecto para cargar la configuración una vez al iniciar la app
   useEffect(() => {
     const fetchConfig = async () => {
       try {
         const loadedConfig = await loadConfiguration();
         setConfig(loadedConfig);
       } catch (err: any) {
-        // Si no se puede cargar el JSON, la app no puede funcionar
         setError(`Error al cargar la configuración: ${err.message}`);
       }
     };
     fetchConfig();
-  }, []); // Se ejecuta solo una vez
+  }, []); 
 
   const handleProcessFile = useCallback(async (file: File) => {
     if (!config) {
@@ -85,7 +79,7 @@ const App: React.FC = () => {
     setIsLoading(true);
     setError(null);
     setDistributedTasks([]);
-    setSelectedFilter(null); // Reset filter on new file
+    setSelectedFilter(null); 
 
     try {
       const text = await extractTextFromPdf(file);
@@ -93,21 +87,15 @@ const App: React.FC = () => {
         throw new Error("No se pudo extraer texto del PDF o el archivo está vacío.");
       }
       
-      // 1. Procesa el PDF con la IA para obtener datos crudos y advertencias
-      const rawTasks = await processPdfText(text, config); // Enviamos la config al servicio
+      const rawTasks = await processPdfText(text, config); 
       
-      // 2. Aplicar la lógica numérica con JavaScript
       const finalTasks = rawTasks.map((task: any, index: number) => {
           const responsable = getResponsable(task.raw_numero, config);
 
-          // Creamos el objeto DistributedTask. 
-          // NOTA: Asumimos que la propiedad 'assignee' en DistributedTask es un string simple.
-          // Si necesita el objeto completo, se requerirá un cambio de tipado en 'types.ts'.
           return {
               ...task, 
               id: `${task.taskIdentifier}-${index}`,
-              assignee: { name: responsable }, // Aquí se usa el responsable asignado por JS
-              // Limpiamos los campos raw_ para el componente TaskList si es necesario
+              assignee: { name: responsable }, 
               raw_numero: undefined,
               raw_descripcion: undefined,
               raw_expediente: undefined,
@@ -120,18 +108,16 @@ const App: React.FC = () => {
         setDistributedTasks(finalTasks as DistributedTask[]);
       }
     } catch (err: any) {
-      // Manejo de errores de PDF, IA, o JSON
       setError(err.message || 'Ocurrió un error inesperado durante el procesamiento.');
     } finally {
       setIsLoading(false);
     }
-  }, [config]); // Depende de la configuración cargada
+  }, [config]);
 
   const filteredTasks = selectedFilter
     ? distributedTasks.filter(task => task.assignee.name === selectedFilter)
     : distributedTasks;
     
-  // Mostramos un mensaje de carga inicial si la configuración aún no se ha cargado
   if (!config && isLoading) {
       return (
           <div className="min-h-screen flex items-center justify-center bg-slate-100">
@@ -145,16 +131,24 @@ const App: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <header className="mb-8">
           <h1 className="text-4xl font-bold text-slate-800 tracking-tight">
-            Distribuidor de Tareas Automatizado
+            Bandejito <span className="text-xl font-normal text-slate-500">(v2.0)</span>
           </h1>
           <p className="mt-2 text-lg text-slate-600">
-            Cargue un PDF para analizarlo con IA, extraer tareas y asignarlas automáticamente.
+            Bandejito es un aplicativo que busca automatizar la distribución de los escritos subidos a la **bandeja de escritos** del juzgado entre el personal.
           </p>
+           <p className="mt-4 text-base text-slate-500 italic">
+             Descargá el PDF de la "Bandeja de Escritos para agregar" y subilo en el recuadro. Bandejito lo analiza con IA y te dice a quién corresponde cada expediente. Si haces click en tu nombre, podés filtrar por los tuyos.
+           </p>
         </header>
 
         <main className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <aside className="lg:col-span-1 flex flex-col gap-8">
-            <FileUpload onProcessFile={handleProcessFile} isLoading={isLoading} disabled={distributedTasks.length > 0 || !config} />
+            <FileUpload 
+                onProcessFile={handleProcessFile} 
+                isLoading={isLoading} 
+                disabled={distributedTasks.length > 0 || !config}
+                // Cambio de texto dentro de FileUpload si es necesario, pero mantenemos la estructura
+            />
             <AssigneeManager selectedFilter={selectedFilter} onSelectFilter={setSelectedFilter} assignees={config?.responsables} /> 
           </aside>
 
@@ -169,7 +163,8 @@ const App: React.FC = () => {
           </section>
         </main>
         <footer className="text-center mt-12 text-sm text-slate-500">
-            <p>Diseñado por un Ingeniero de React experto en API de Gemini y UI/UX.</p>
+            <p>Bandejito v.2.0</p>
+            <p>Creado por JC con ayuda de Gemini</p>
         </footer>
       </div>
     </div>
