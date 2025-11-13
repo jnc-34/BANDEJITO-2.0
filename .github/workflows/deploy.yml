@@ -25,11 +25,12 @@ jobs:
         run: npm install
         
       - name: Build
-        # El comando run es simple, las variables de entorno pasan la clave y la ruta base (BASE_URL)
+        # El comando run es simple. Las variables de entorno pasan la clave y la ruta base.
         run: npm run build
         env:
           VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
-          VITE_BASE_URL: /${{ github.event.repository.name }}/ # ¡Ruta base corregida!
+          # Pasamos el nombre del repositorio. El paquete.json añade las barras inclinadas.
+          VITE_BASE_URL: ${{ github.event.repository.name }}
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
