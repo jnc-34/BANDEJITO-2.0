@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --base ${VITE_BASE_URL}",
+    "build": "tsc && vite build --base /$VITE_BASE_URL/",
     "preview": "vite preview"
   },
   "dependencies": {
