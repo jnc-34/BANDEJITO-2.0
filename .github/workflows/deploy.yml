@@ -24,8 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build
-        run: npm run build
-        env:
+run: npm run build --base /${{ github.event.repository.name }}/
+env:
           VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
       - name: Setup Pages
