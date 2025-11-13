@@ -1,74 +1,114 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { ProcessedTask } from '../types';
+import { GoogleGenAI, Type } from '@google/genai';
+import { ProcessedTask } from '../types'; // Asumo que este tipo existe
 
 // La clave de API DEBE leerse de import.meta.env en proyectos de Vite.
-// Usamos VITE_API_KEY, que es el nombre del secreto que configuraste en GitHub.
 const apiKey = import.meta.env.VITE_API_KEY;
 
 if (!apiKey) {
-    // Si la clave no está presente (ej. falló la inyección de Vite), lanzamos un error claro.
-    console.error("ERROR: La clave de API (VITE_API_KEY) no está configurada. Por favor, revise GitHub Secrets o su entorno local.");
-    // Esto coincide con el error que vimos en la consola.
+    console.error("ERROR: La clave de API (VITE_API_KEY) no está configurada.");
     throw new Error("An API Key must be set when running in a browser");
 }
 
 const ai = new GoogleGenAI({ apiKey });
 
-const prompt = `
-Eres un asistente experto en procesar texto extraído de documentos PDF. El texto contiene datos tabulares con 6 columnas, aunque el formato del texto puede no ser perfecto. Las columnas son: "fecha Entrada", "Descripción", "Fojas", "Número", "Año" y "Expediente". Tu tarea es procesar cada fila de datos siguiendo estas reglas de manera estricta:
+// Schema ajustado para extraer los campos necesarios para la lógica JS.
+const schema = {
+  type: Type.ARRAY,
+  items: {
+    type: Type.OBJECT,
+    properties: {
+      taskIdentifier: {
+        type: Type.STRING,
+        description: "El string combinado con el formato 'Número/Año'.",
+      },
+      warningMessage: {
+        type: Type.STRING,
+        description: "El mensaje de advertencia si se encuentra una palabra clave, o un string vacío si no se encuentra.",
+      },
+      // Campos de materia prima que el código JS usará para la asignación
+      raw_numero: {
+        type: Type.STRING,
+        description: "El valor original extraído de la columna 'Número'."
+      },
+      raw_descripcion: {
+        type: Type.STRING,
+        description: "El valor original extraído de la columna 'Descripción'."
+      },
+      raw_expediente: {
+        type: Type.STRING,
+        description: "El valor original extraído de la columna 'Expediente'."
+      }
+    },
+    required: ["taskIdentifier", "warningMessage", "raw_numero", "raw_descripcion", "raw_expediente"],
+  },
+};
 
-1.  **Ignora completamente** las columnas "fecha Entrada" y "Fojas".
-2.  Para cada fila, extrae el valor de la columna "Número" y el valor de la columna "Año".
-3.  Crea un string unificado combinando estos dos valores con el formato "Número/Año".
-4.  En la columna "Descripción" de la misma fila, busca una **coincidencia exacta y de palabra completa** con una de las siguientes frases clave (no distingue mayúsculas de minúsculas): "urgente", "pronto despacho", "cautelar", "confronte". Es crucial que la coincidencia sea exacta; por ejemplo, la palabra "Comprobante" NO debe coincidir con "confronte".
-5.  En la columna "Expediente" de la misma fila, busca una **coincidencia exacta y de palabra completa** con la palabra clave "beneficio" (no distingue mayúsculas de minúsculas).
-6.  Si encuentras una coincidencia exacta de **cualquiera** de las palabras clave mencionadas en los pasos 4 o 5, crea un mensaje de advertencia con el formato exacto: "- ADVERTENCIA: PALABRA CLAVE [PALABRA ENCONTRADA] ENCONTRADA". Debes usar la palabra clave encontrada, en mayúsculas.
-7.  Si no encuentras ninguna coincidencia exacta de las palabras clave en una fila, el campo de advertencia debe ser un string vacío (""). No inventes advertencias.
+// ----------------------------------------------
+// Función para Cargar la Configuración (JSON)
+// ----------------------------------------------
 
-Devuelve el resultado como un array de objetos JSON, sin ninguna otra explicación o texto adicional.
+export async function loadConfiguration(): Promise<any> {
+    // Usa import.meta.env.BASE_URL para obtener la ruta base del GitHub Pages
+    const configPath = import.meta.env.BASE_URL + 'config.json'; 
+    try {
+        const response = await fetch(configPath);
+        if (!response.ok) {
+            throw new Error(`Error al cargar el archivo de configuración: ${response.statusText}`);
+        }
+        return response.json();
+    } catch (error) {
+        console.error("Error al cargar la configuración:", error);
+        throw new Error("No se pudo cargar la configuración de asignación. Verifique el archivo config.json.");
+    }
+}
+
+// ----------------------------------------------
+// Función para Procesar el PDF (Gemini)
+// ----------------------------------------------
+
+export const processPdfText = async (text: string, config: any): Promise<any[]> => {
+    
+    // Extrayendo palabras clave dinámicas del JSON para el prompt de Gemini
+    const descKeywords = config.palabrasClaveAdvertencia.columna_descripcion.join(', ');
+    const expKeywords = config.palabrasClaveAdvertencia.columna_expediente.join(', ');
+
+    const prompt = `
+Eres un asistente experto en procesar texto extraído de documentos PDF. El texto contiene datos tabulares con 6 columnas: "fecha Entrada", "Descripción", "Fojas", "Número", "Año" y "Expediente". Tu tarea es procesar cada fila de datos siguiendo estas reglas de manera estricta:
+
+**REGLAS DE PROCESAMIENTO GENERALES:**
+1.  **Ignora completamente** las columnas "fecha Entrada" y "Fojas".
+2.  Extrae los valores originales de las columnas **"Número"**, **"Año"**, **"Descripción"** y **"Expediente"**.
+3.  Crea un string unificado combinando "Número/Año" para el campo 'taskIdentifier'.
+
+**REGLAS DE ADVERTENCIAS (DINÁMICAS):**
+4.  Busca una **coincidencia exacta y de palabra completa** con las siguientes frases clave (no distingue mayúsculas de minúsculas):
+    * En la columna "Descripción": ${descKeywords}.
+    * En la columna "Expediente": ${expKeywords}.
+Es crucial que la coincidencia sea exacta
+5.  Si encuentras una coincidencia, el campo 'warningMessage' debe tener el formato exacto: "- ADVERTENCIA: PALABRA CLAVE [PALABRA ENCONTRADA] ENCONTRADA". Si no hay coincidencia, debe ser un string vacío ("").
+
+**IMPORTANTE:** No intentes asignar responsables ni crear advertencias; la aplicación lo hará con una regla numérica separada. Solo devuelve la estructura JSON solicitada.
 
 Aquí está el texto extraído del PDF para procesar:
 `;
 
-const schema = {
-  type: Type.ARRAY,
-  items: {
-    type: Type.OBJECT,
-    properties: {
-      taskIdentifier: {
-        type: Type.STRING,
-        description: "El string combinado con el formato 'Número/Año'.",
-      },
-      warningMessage: {
-        type: Type.STRING,
-        description: "El mensaje de advertencia si se encuentra una palabra clave, o un string vacío si no se encuentra.",
-      },
-    },
-    required: ["taskIdentifier", "warningMessage"],
-  },
-};
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `${prompt}\n\n${text}`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: schema,
+      },
+    });
 
-export const processPdfText = async (text: string): Promise<ProcessedTask[]> => {
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `${prompt}\n\n${text}`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: schema,
-      },
-    });
+    const jsonString = response.text.trim();
+    return JSON.parse(jsonString) as any[];
 
-    const jsonString = response.text.trim();
-    const result = JSON.parse(jsonString);
-
-    if (!Array.isArray(result)) {
-        throw new Error("La respuesta de Gemini no es un array válido.");
-    }
-
-    return result as ProcessedTask[];
-  } catch (error) {
-    console.error("Error processing text with Gemini:", error);
-    throw new Error("No se pudo procesar el texto con la IA. Verifique el formato del PDF.");
-  }
+  } catch (error) {
+    console.error("Error processing text with Gemini:", error);
+    throw new Error("No se pudo procesar el texto con la IA. Verifique el formato del PDF.");
+  }
 };
