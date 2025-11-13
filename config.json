@@ -1,0 +1,43 @@
+{
+  "responsables": [
+    "CA - CATERINA",
+    "RO - ROMINA",
+    "CL - CLARISA",
+    "MA - MARISA",
+    "SU - SUSANA",
+    "FR - FRANCISCO",
+    "LU - LUCIANA",
+    "JU - JUAN"
+  ],
+  "asignacion_por_digito": {
+    "regla_un_digito": {
+      // Regla general: asignación por último dígito, excluyendo 0 y 8.
+      "1": "CA - CATERINA",
+      "2": "RO - ROMINA",
+      "3": "CL - CLARISA",
+      "4": "MA - MARISA",
+      "5": "SU - SUSANA",
+      "6": "FR - FRANCISCO",
+      "7": "LU - LUCIANA",
+      "9": "JU - JUAN"
+    },
+    "regla_excepcion_0_8": {
+      // Regla para números que terminan en 8
+      "8": [
+        {"digitos": ["08", "18", "28"], "responsable": "FR - FRANCISCO"},
+        {"digitos": ["38", "48", "58"], "responsable": "LU - LUCIANA"},
+        {"digitos": ["68", "78", "88", "98"], "responsable": "JU - JUAN"}
+      ],
+      // Regla para números que terminan en 0
+      "0": [
+        {"digitos": ["00", "10", "20", "30", "40"], "responsable": "MA - MARISA"},
+        {"digitos": ["50", "60", "70", "80"], "responsable": "SU - SUSANA"},
+        {"digitos": ["90"], "responsable": "JU - JUAN"}
+      ]
+    }
+  },
+  "palabrasClaveAdvertencia": {
+    "columna_descripcion": ["urgente", "pronto despacho", "cautelar", "confronte"],
+    "columna_expediente": ["beneficio"]
+  }
+}
