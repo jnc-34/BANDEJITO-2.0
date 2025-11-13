@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Distribuidor de Tareas Automatizado",
+  "description": "Una aplicación web para automatizar la distribución de trabajo cargando un archivo PDF. Extrae información, la procesa con Gemini para identificar tareas y advertencias, y las asigna a los responsables.",
+  "requestFramePermissions": []
+}
