@@ -2,11 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
-  const repoName = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : '';
-
-  return {
-    plugins: [react()],
-    base: command === 'build' ? `/${repoName}/` : '/',
-  };
+export default defineConfig({
+  plugins: [react()],
+  // 🟢 FORZAMOS LA RUTA BASE a la subcarpeta de GitHub Pages
+  base: '/BANDEJITO-2.0/' 
 });
