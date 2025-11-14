@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// import App from './App'; // ❌ COMENTAR ESTO TEMPORALMENTE
+import App from './App';
 
 import './index.css'; 
 
@@ -12,7 +12,6 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
     <React.StrictMode>
-        {/* 🟢 REEMPLAZAR <App /> CON UN TEXTO SIMPLE */}
-        <h1 style={{ color: 'red', textAlign: 'center' }}>¡REACT ESTÁ MONTADO!</h1>
+        <App />
     </React.StrictMode>
 );

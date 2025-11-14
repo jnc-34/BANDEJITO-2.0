@@ -8,5 +8,12 @@ export default defineConfig({
   // Mantenemos solo la ruta base para GitHub Pages
   base: '/BANDEJITO-2.0/', 
   
-  // ¡ELIMINAR TODO EL BLOQUE 'build' DE ROLLUP!
+  // 🟢 CORRECCIÓN DEFINITIVA: Forzar la resolución del script de entrada con la extensión correcta.
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.jsx', // ¡Usamos la extensión real!
+      },
+    },
+  },
 });
