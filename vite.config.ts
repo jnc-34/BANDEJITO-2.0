@@ -6,16 +6,6 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   
+  // Mantenemos solo la ruta base para GitHub Pages
   base: '/BANDEJITO-2.0/', 
-  
-  // 🟢 CONFIGURACIÓN PARA FORZAR LA SALIDA .js
-  build: {
-    rollupOptions: {
-      input: {
-        main: 'index.tsx', // Indica que el punto de entrada es index.tsx
-      },
-    },
-    // Esto asegura que la salida sea un archivo .js que el navegador reconocerá.
-    // Aunque esta configuración es avanzada, ayuda a que Rollup maneje el punto de entrada.
-  }
 });
