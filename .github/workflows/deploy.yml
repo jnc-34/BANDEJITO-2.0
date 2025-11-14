@@ -25,10 +25,10 @@ jobs:
         run: npm install
         
       - name: Build
-        # Ejecuta el build y pasa la clave API como variable de entorno
-        run: npm run build
+        # 🟢 Asegura que Vite construya para la subcarpeta /BANDEJITO-2.0/
         env:
-          VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
+          PUBLIC_URL: /${{ github.event.repository.name }} 
+        run: npm run build
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
