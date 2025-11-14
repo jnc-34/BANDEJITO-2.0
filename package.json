@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    // 🟢 CORRECCIÓN: El script 'build' debe ser simple para que Vite use vite.config.ts
     "build": "tsc && vite build", 
     "preview": "vite preview"
   },
