@@ -5,8 +5,16 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   
-  // 🟢 RUTA BASE DEFINITIVA para GitHub Pages
-  base: '/BANDEJITO-2.0/', 
+  // 🟢 BASE: Utilizamos la ruta relativa ('.') para máxima compatibilidad con GitHub Pages
+  base: './', 
   
-  // ¡ELIMINAR cualquier configuración de 'build' compleja para evitar conflictos!
+  // 🟢 CORRECCIÓN FINAL: Definimos explícitamente el punto de entrada para Rollup/Vite
+  // Esto resuelve el problema de "asset not found" en el despliegue.
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.js', // ¡Debe coincidir con tu archivo renombrado!
+      },
+    },
+  },
 });
