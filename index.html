@@ -1,14 +1,21 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Distribuidor de Tareas Automatizado</title>
-    <!-- Ruta relativa para el CSS (Vite inyectará la etiqueta <link> correcta en el build) -->
-</head>
-<body class="bg-slate-100">
-    <div id="root"></div>
-    <!-- ¡IMPORTANTE! Hemos ELIMINADO el <script type="module" src="/index.jsx"></script> -->
-    <!-- Vite lo inyectará automáticamente con la ruta base correcta (/BANDEJITO-2.0/) -->
-</body>
-</html>
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App'; // 🟢 REGRESA A IMPORTAR APP
+
+import './index.css'; 
+
+// 🟢 TRAZABILIDAD CRÍTICA: Confirmar que el código de entrada se está ejecutando
+console.log("INDEX.JSX: El motor de JavaScript ha iniciado."); 
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+    throw new Error("Could not find root element to mount to");
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+    <React.StrictMode>
+        {/* 🟢 REGRESA A RENDERIZAR APP */}
+        <App />
+    </React.StrictMode>
+);
