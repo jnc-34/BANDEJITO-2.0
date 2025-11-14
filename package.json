@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --base /$VITE_BASE_URL/",
+    // 🟢 CORREGIDO: Eliminado el argumento --base para que Vite use vite.config.js
+    "build": "tsc && vite build", 
     "preview": "vite preview"
   },
   "dependencies": {
