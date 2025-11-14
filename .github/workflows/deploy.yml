@@ -25,9 +25,7 @@ jobs:
         run: npm install
         
       - name: Build
-        # 🟢 Asegura que Vite construya para la subcarpeta /BANDEJITO-2.0/
-        env:
-          PUBLIC_URL: /${{ github.event.repository.name }} 
+        # ❌ ELIMINAMOS la variable de entorno PUBLIC_URL. Vite usará la config de vite.config.ts
         run: npm run build
           
       - name: Setup Pages
