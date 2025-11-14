@@ -24,13 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm install
         
-      - name: Build
-        # El comando run es simple. Las variables de entorno pasan la clave y la ruta base.
+     - name: Build
+        # El comando 'run' simple ejecutará el script 'build' de package.json
+        # y usará la ruta base definida en vite.config.ts, sin conflictos.
         run: npm run build
-        env:
-          VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
-          # Pasamos el nombre del repositorio. El paquete.json añade las barras inclinadas.
-          VITE_BASE_URL: ${{ github.event.repository.name }}
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
