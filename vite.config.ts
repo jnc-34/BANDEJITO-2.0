@@ -9,11 +9,11 @@ export default defineConfig({
   // Mantenemos solo la ruta base para GitHub Pages
   base: '/BANDEJITO-2.0/', 
 
-  // 🟢 CORRECCIÓN: Decirle explícitamente a Rollup cuál es el archivo de entrada.
+  // 🟢 CORRECCIÓN: Usar la ruta relativa explícita (./)
   build: {
     rollupOptions: {
       input: {
-        main: 'index.js', // El nuevo nombre del archivo fuente
+        main: './index.js', // ¡Este punto es crucial en ambientes CI!
       },
     },
   },
