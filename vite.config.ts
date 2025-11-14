@@ -5,15 +5,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   
-  // 🟢 BASE: Usamos la ruta absoluta de GitHub Pages
-  base: '/BANDEJITO-2.0/', 
+  // 🟢 BASE: Usamos la ruta RELATIVA ('.') - la más segura para GitHub Pages en subcarpetas.
+  base: './', 
   
-  // Mantenemos el input explícito a index.jsx
-  build: {
-    rollupOptions: {
-      input: {
-        main: './index.jsx', // Aseguramos que apunte a .jsx
-      },
-    },
-  },
+  // ❌ IMPORTANTE: Eliminamos el bloque 'build.rollupOptions'
+  // Dejamos que Vite configure la compilación automáticamente.
 });
