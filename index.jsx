@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App'; // 🟢 REGRESA A IMPORTAR APP
+import App from './App';
 
 import './index.css'; 
 
 // 🟢 TRAZABILIDAD CRÍTICA: Confirmar que el código de entrada se está ejecutando
-console.log("INDEX.JS: El motor de JavaScript ha iniciado."); 
+console.log("INDEX.JSX: El motor de JavaScript ha iniciado."); 
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

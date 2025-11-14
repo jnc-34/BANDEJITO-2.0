@@ -13,7 +13,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: './index.js', // ¡Debe coincidir con tu archivo renombrado!
+        main: './index.jsx', // ¡Debe coincidir con tu archivo renombrado!
       },
     },
   },
