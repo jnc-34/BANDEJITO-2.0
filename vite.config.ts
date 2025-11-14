@@ -5,8 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   
-  // 1. Corregimos la ruta base para que carguen estilos y librerías en GitHub Pages.
-  base: '/BANDEJITO-2.0/', 
+  // 🟢 SOLUCIÓN DEFINITIVA: Usamos ruta RELATIVA ('./') 
+  // para que los estilos y librerías carguen correctamente en GitHub Pages.
+  base: './', 
   
   // 2. No se requiere la sección 'define'. 
   // Vite inyecta VITE_API_KEY automáticamente para que se acceda con import.meta.env.VITE_API_KEY.
