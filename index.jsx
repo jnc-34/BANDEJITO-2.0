@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+// import App from './App'; // ❌ COMENTAR ESTO TEMPORALMENTE
 
-// 🟢 CORRECCIÓN: DEBES IMPORTAR EL ARCHIVO CSS DE ENTRADA
 import './index.css'; 
 
 const rootElement = document.getElementById('root');
@@ -13,6 +12,7 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
     <React.StrictMode>
-        <App />
+        {/* 🟢 REEMPLAZAR <App /> CON UN TEXTO SIMPLE */}
+        <h1 style={{ color: 'red', textAlign: 'center' }}>¡REACT ESTÁ MONTADO!</h1>
     </React.StrictMode>
 );
